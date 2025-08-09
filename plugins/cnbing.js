@@ -10,7 +10,6 @@ let cnbing = {
 
     get: async function (keyword, numbers) {
         const response = await Http.get(this.baseurl + "?q=" + encodeURIComponent(keyword));
-        const data = JSON.parse(response);
 
 
 

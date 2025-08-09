@@ -39,6 +39,7 @@ dependencies:
   rhttp: ^0.13.0
   path_provider: ^2.0.15
   flutter_js: ^0.8.5
+  path: ^1.9.1
 
 dev_dependencies:
   flutter_test:

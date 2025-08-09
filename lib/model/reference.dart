@@ -3,7 +3,11 @@ class ReferenceData {
   final String url;
   final String body;
 
-  ReferenceData({required this.title, required this.url, required this.body});
+  const ReferenceData({
+    required this.title,
+    required this.url,
+    required this.body,
+  });
 
   @override
   String toString() {
@@ -11,5 +15,17 @@ class ReferenceData {
 [$title]($url)
 
 $body''';
+  }
+
+  static ReferenceData from(Map data) {
+    return ReferenceData(
+      title: data["title"],
+      url: data["url"],
+      body: data["body"],
+    );
+  }
+
+  static List<ReferenceData> fromIter(Iterable<Map> data) {
+    return data.map(from).toList();
   }
 }

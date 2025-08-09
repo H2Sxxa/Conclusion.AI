@@ -49,7 +49,7 @@ class JavaScriptEngine {
         });
       }
     });
-    runtime.onMessage("config", (keys) async {
+    runtime.onMessage("config", (key) async {
       //TODO
     });
 
@@ -70,7 +70,7 @@ class JavaScriptEngine {
 }
 
 class PluginLoader {
-  static final HashSet<String> registeredPlugins = HashSet();
+  static final HashMap<String, PluginMetaData> registeredPlugins = HashMap();
   static Future<void> loadPlugins() async {
     // TODO Load and initialize all plugins
   }
@@ -80,7 +80,7 @@ class PluginLoader {
     required String keyword,
     required int numbers,
   }) async {
-    if (!registeredPlugins.contains(name)) {
+    if (!registeredPlugins.keys.contains(name)) {
       throw Exception("Plugin not registered");
     }
 
@@ -88,8 +88,24 @@ class PluginLoader {
       "$name.get('$name', '$keyword', $numbers)",
     );
 
-    //TODO
-
-    return [];
+    return ReferenceData.fromIter(jsonDecode(result.rawResult));
   }
+}
+
+class PluginMetaData {
+  String name;
+  String baseurl;
+  String version;
+  String description;
+  String minappversion;
+  Map<String, String> settings;
+
+  PluginMetaData({
+    required this.name,
+    required this.baseurl,
+    required this.version,
+    required this.description,
+    required this.minappversion,
+    required this.settings,
+  });
 }

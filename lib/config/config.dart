@@ -5,7 +5,7 @@ class AppConfigKeys {
   static const String apikey = "APIKEY";
   static const String model = "MODEL";
 
-  static Future<void> initialize() async {
+  static Future<void> init() async {
     instance = await SharedPreferences.getInstance();
   }
 }

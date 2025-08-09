@@ -1,4 +1,5 @@
 import 'package:conclusion/config/config.dart';
+import 'package:conclusion/config/storage.dart';
 import 'package:conclusion/plugin/engine.dart';
 import 'package:conclusion/view/pages/search.dart';
 import 'package:conclusion/view/pages/settings.dart';
@@ -9,9 +10,14 @@ import 'package:rhttp/rhttp.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Rhttp.init();
-  await JavaScriptEngine.init();
-  await AppConfigKeys.initialize();
+
+  await Future.wait([
+    AppStorage.init(),
+    Rhttp.init(),
+    JavaScriptEngine.init(),
+    AppConfigKeys.init(),
+  ]);
+
   OpenAI.apiKey = AppConfigValues.apikey ?? "";
 
   runApp(const MyApp());
