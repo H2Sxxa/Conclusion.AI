@@ -1,3 +1,5 @@
+import 'dart:collection';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
@@ -21,7 +23,7 @@ class AppStorage {
     return dir;
   }
 
-  static Future<File> pluginsConfig() async {
+  static Future<File> pluginsConfigFile() async {
     final file = File(path.join(baseDirectory.path, 'plugins_config.json'));
     if (!await file.exists()) {
       await file.writeAsString('{}');
@@ -29,7 +31,7 @@ class AppStorage {
     return file;
   }
 
-  static File pluginsConfigSync() {
+  static File pluginsConfigFileSync() {
     final file = File(path.join(baseDirectory.path, 'plugins_config.json'));
     if (!file.existsSync()) {
       file.writeAsStringSync('{}');
@@ -39,5 +41,37 @@ class AppStorage {
 }
 
 class PluginsConfig {
-  // HashMap<String, String> _cache;
+  final File pluginsConfig;
+  final HashMap<String, String> _cache;
+
+  PluginsConfig({required this.pluginsConfig})
+    : _cache = jsonDecode(pluginsConfig.readAsStringSync());
+
+  factory PluginsConfig.instance() {
+    return PluginsConfig(pluginsConfig: AppStorage.pluginsConfigFileSync());
+  }
+
+  void writeSync(String key, String value) {
+    _cache[key] = value;
+    pluginsConfig.writeAsStringSync(jsonEncode(_cache));
+  }
+
+  Future<void> write(String key, String value) async {
+    _cache[key] = value;
+    await pluginsConfig.writeAsString(jsonEncode(_cache));
+  }
+
+  String? read(String key) {
+    return _cache[key];
+  }
+
+  void clearSync() {
+    _cache.clear();
+    pluginsConfig.writeAsStringSync(jsonEncode(_cache));
+  }
+
+  Future<void> clear() async {
+    _cache.clear();
+    await pluginsConfig.writeAsString(jsonEncode(_cache));
+  }
 }
