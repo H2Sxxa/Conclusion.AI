@@ -5,6 +5,7 @@ import 'package:conclusion/view/pages/search.dart';
 import 'package:conclusion/view/pages/settings.dart';
 import 'package:dart_openai/dart_openai.dart';
 import 'package:dynamic_system_colors/dynamic_system_colors.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:rhttp/rhttp.dart';
 
@@ -17,6 +18,9 @@ void main() async {
     JavaScriptEngine.init(),
     AppConfigKeys.init(),
   ]);
+  if (kDebugMode) {
+    PluginLoader.loadPluginsFrom("plugins");
+  }
 
   OpenAI.apiKey = AppConfigValues.apikey ?? "";
 

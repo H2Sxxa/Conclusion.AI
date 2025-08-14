@@ -1,5 +1,4 @@
 import 'package:conclusion/llm.dart';
-import 'package:conclusion/model/reference.dart';
 import 'package:flutter/material.dart';
 
 class SearchPage extends StatefulWidget {

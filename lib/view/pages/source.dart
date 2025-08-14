@@ -1,3 +1,4 @@
+import 'package:conclusion/plugin/engine.dart';
 import 'package:flutter/material.dart';
 
 class SourcePage extends StatefulWidget {
@@ -15,9 +16,20 @@ class SourcePageState extends State<SourcePage> {
         title: Text('Source', style: TextStyle(fontWeight: FontWeight.bold)),
       ),
       body: ListView(
-        children: [
-          ListTile(title: Text('Bing (CN)'), onTap: () {}, trailing: Text("2")),
-        ],
+        children: PluginLoader.registeredPlugins.values
+            .map(
+              (e) => ListTile(
+                title: Text(e.name),
+                subtitle: Text(
+                  e.description,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                trailing: Text(e.version),
+                onTap: () {},
+              ),
+            )
+            .toList(),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {

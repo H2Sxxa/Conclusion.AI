@@ -1,9 +1,11 @@
 import 'dart:collection';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:conclusion/model/reference.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_js/flutter_js.dart';
+import 'package:path/path.dart';
 import 'package:rhttp/rhttp.dart';
 
 class JavaScriptEngine {
@@ -75,6 +77,44 @@ class PluginLoader {
     // TODO Load and initialize all plugins
   }
 
+  static Future<void> loadPluginsFrom(String path) async {
+    final directory = Directory(path);
+    if (!await directory.exists()) {
+      return;
+    }
+
+    directory
+        .list()
+        .where(
+          (e) =>
+              e.path.endsWith(".js") &&
+              e.statSync().type == FileSystemEntityType.file,
+        )
+        .forEach((file) async {
+          var name = basename(file.path);
+          if (name.endsWith(".js")) {
+            name = name.substring(0, name.length - 3);
+          }
+          final content = await File(file.path).readAsString();
+          final code =
+              '''$content
+
+          JSON.stringify({
+            "name": $name.name,
+            "baseurl": $name.baseurl,
+            "version": $name.version,
+            "description": $name.description,
+            "minappversion": $name.minappversion,
+            "settings": $name.settings
+          })
+          ''';
+          final meta = JavaScriptEngine.eval(code);
+          registeredPlugins[name] = PluginMetaData.fromJson(
+            jsonDecode(meta.rawResult),
+          );
+        });
+  }
+
   static Future<List<ReferenceData>> callPlugin({
     required String name,
     required String keyword,
@@ -85,7 +125,7 @@ class PluginLoader {
     }
 
     final result = await JavaScriptEngine.evalPromise(
-      "$name.get('$name', '$keyword', $numbers)",
+      "$name.get('$keyword', $numbers)",
     );
 
     return ReferenceData.fromIter(jsonDecode(result.rawResult));
@@ -108,4 +148,15 @@ class PluginMetaData {
     required this.minappversion,
     required this.settings,
   });
+
+  static PluginMetaData fromJson(Map<String, dynamic> json) {
+    return PluginMetaData(
+      name: json["name"],
+      baseurl: json["baseurl"],
+      version: json["version"],
+      description: json["description"],
+      minappversion: json["minappversion"],
+      settings: Map<String, String>.from(json["settings"]),
+    );
+  }
 }
